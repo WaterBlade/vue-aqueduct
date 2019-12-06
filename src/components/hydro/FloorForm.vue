@@ -4,12 +4,12 @@
 
           <el-col>
             <el-divider content-position="left">3.1-上游渠道断面参数</el-divider>
-            <floor-sect-form/>
+            <floor-sect-form sectPosition="up"/>
           </el-col>
 
           <el-col>
             <el-divider content-position="left">3.2-下游渠道断面参数</el-divider>
-            <floor-sect-form/>
+            <floor-sect-form sectPosition="down"/>
           </el-col>
 
         </el-row>
@@ -17,12 +17,12 @@
         <el-row>
           <el-col>
             <el-divider content-position="left">3.3-进口渐变段参数</el-divider>
-            <trans-form/>
+            <trans-form transPosition="inlet"/>
           </el-col>
 
           <el-col>
             <el-divider content-position="left">3.4-出口渐变段参数</el-divider>
-            <trans-form/>
+            <trans-form transPosition="outlet"/>
           </el-col>
 
         </el-row>
@@ -38,12 +38,19 @@
               <el-form-item label="上游渠道底板高程(m)">
                 <el-input v-model="flumeForm.inletFloor" />
               </el-form-item>
-            <el-button type="primary">底板高程试算</el-button>
+            <el-button type="primary" @click="onButton">底板高程试算</el-button>
             </el-form>
           </el-row>
         </el-col>
         <el-col>
-          <el-card>计算结果</el-card>
+          <el-card>
+            计算结果
+            <div v-if="showResult">
+              <p>槽身进口底板高程：{{ Number(flumeInFloor).toFixed(3) }} m</p>
+              <p>槽身出口底板高程：{{ Number(flumeOutFloor).toFixed(3) }} m</p>
+              <p>下游渠道底板高程：{{ Number(outletFloor).toFixed(3) }} m</p>
+            </div>
+          </el-card>
         </el-col>
       </el-row>
     </el-row>
@@ -59,10 +66,57 @@ import TransForm from './floor/TransForm.vue';
     },
 })
 export default class FloorForm extends Vue {
-    public flumeForm: {
-        l?: number,
-        inletFloor?: number,
-    } = {};
+    public flumeInFloor: number = 0;
+    public flumeOutFloor: number = 0;
+    public outletFloor: number = 0;
+    public showResult = false;
+    get flumeForm() {
+      return this.$store.state.flumeForm;
+    }
+    set flumeForm(value) {
+      this.$store.commit('updateFlumeForm', value);
+    }
+    public onButton() {
+      const {up, down} = this.$store.state.floorSectForm;
+      const {inlet, outlet} = this.$store.state.transForm;
+      const flume = this.$store.state.flumeForm;
+      const hydro = this.$store.state.hydro;
+      hydro.setUpSect(
+        up.sectType,
+        Number(up.iDen),
+        Number(up.n),
+        up.sectType === 'trape' ?
+          { b: Number(up.b), m: Number(up.m)} :
+          { b: Number(up.b) },
+      );
+      hydro.setDownSect(
+        down.sectType,
+        Number(down.iDen),
+        Number(down.n),
+        down.sectType === 'trape' ?
+          { b: Number(down.b), m: Number(down.m)} :
+          { b: Number(down.b) },
+      );
+      hydro.setFlow(
+        Number(inlet.l),
+        Number(flume.l),
+        Number(outlet.l),
+        Number(inlet.n),
+        Number(outlet.n),
+        Number(inlet.zeta),
+        Number(outlet.zeta),
+        Number(flume.inletFloor),
+      );
+      hydro.calcZ();
+      hydro.calcDZ();
+      [this.flumeInFloor, this.flumeOutFloor, this.outletFloor] = hydro.calcN();
+      this.showResult = true;
+      this.$store.commit('updateLineForm', {
+        flumeInFloor: Number(this.flumeInFloor).toFixed(3),
+        flumeOutFloor: Number(this.flumeOutFloor).toFixed(3),
+        outletFloor: Number(this.outletFloor).toFixed(3),
+      });
+    }
 }
 </script>
 <style scoped>

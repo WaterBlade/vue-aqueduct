@@ -15,37 +15,11 @@
     <el-divider content-position="left">
       <b>4</b>-水面线推算
     </el-divider>
-    <el-row>
-        <el-col>
-            <el-row>
-            <el-form label-width="180px">
-                <el-form-item label="槽身进口底板高程(m)">
-                    <el-input/>
-                </el-form-item>
-                <el-form-item label="槽身出口底板高程(m)">
-                    <el-input/>
-                </el-form-item>
-                <el-form-item label="下游渠道底板高程(m)">
-                    <el-input/>
-                </el-form-item>
-            </el-form>
-            </el-row>
-            <el-row>
-            <el-button type="primary">水面线推算</el-button>
-            </el-row>
-        </el-col>
-        <el-col>
-            <el-card>计算结果</el-card>
-        </el-col>
-    </el-row>
+    <line-form/>
     <el-divider content-position="left">
       <b>5</b>-渡槽水力学计算算稿
     </el-divider>
-    <el-row>
-        <el-col>
-            <el-button type="primary">生成算稿</el-button>
-        </el-col>
-    </el-row>
+    <report-form/>
   </div>
 </template>
 <script lang="ts">
@@ -53,54 +27,17 @@ import {Vue, Component} from 'vue-property-decorator';
 import SectForm from '@/components/hydro/SectForm.vue';
 import HeightForm from '@/components/hydro/HeightForm.vue';
 import FloorForm from '@/components/hydro/FloorForm.vue';
+import LineForm from '@/components/hydro/LineForm.vue';
+import ReportForm from '@/components/ReportForm.vue';
 
 @Component({components: {
     'sect-form': SectForm,
     'height-form': HeightForm,
     'floor-form': FloorForm,
+    'line-form': LineForm,
+    'report-form': ReportForm,
 }})
 export default class Hydro extends Vue {
-    public floorForm: {
-        up: {
-            sectType?: 'rect'|'trape',
-            iDen?: number,
-            n?: number,
-            b?: number,
-            m?: number,
-        },
-        down: {
-            sectType?: 'rect'|'trape',
-            iDen?: number,
-            n?: number,
-            b?: number,
-            m?: number,
-        },
-        inlet: {
-            l?: number,
-            zeta?: number,
-            n?: number,
-        },
-        outlet: {
-            l?: number,
-            zeta?: number,
-            n?: number,
-        },
-        flume: {
-            l?: number,
-            inletFloor?: number,
-        },
-    } = {
-        up: {},
-        down: {},
-        inlet: {},
-        outlet: {},
-        flume: {},
-    };
-    public lineForm: {
-        inFlumeFloor?: number,
-        outFlumeFloor?: number,
-        outletFloor?: number,
-    } = {};
 }
 </script>
 <style scoped>

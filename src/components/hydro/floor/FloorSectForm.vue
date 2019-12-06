@@ -1,5 +1,5 @@
 <template>
-  <el-form label-width="120px">
+  <el-form label-width="120px" :model="sectForm">
     <el-form-item label="断面形式">
       <el-radio-group v-model="sectForm.sectType">
         <el-radio-button label="rect">矩形断面</el-radio-button>
@@ -21,16 +21,16 @@
   </el-form>
 </template>
 <script lang="ts">
-import {Vue, Component} from 'vue-property-decorator';
+import {Vue, Component, Prop} from 'vue-property-decorator';
 @Component
 export default class FloorSectForm extends Vue {
-    public sectForm: {
-        sectType?: 'rect'|'trape',
-        iDen?: number,
-        n?: number,
-        b?: number,
-        m?: number,
-    } = {};
+    @Prop(String) public sectPosition!: 'up'| 'down';
+    get sectForm() {
+      return this.$store.state.floorSectForm[this.sectPosition];
+    }
+    set sectForm(value) {
+      this.$store.commit('updateFloorSectForm', {sectPosition: this.sectPosition, value});
+    }
 }
 </script>
 <style scoped>

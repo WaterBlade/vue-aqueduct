@@ -12,14 +12,16 @@
   </el-form>
 </template>
 <script lang="ts">
-import {Vue, Component} from 'vue-property-decorator';
+import {Vue, Component, Prop} from 'vue-property-decorator';
 @Component
 export default class TransForm extends Vue {
-    public transForm: {
-        l?: number,
-        zeta?: number,
-        n?: number,
-    } = {};
+    @Prop() public transPosition!: 'inlet' | 'outlet';
+    get transForm() {
+      return this.$store.state.transForm[this.transPosition];
+    }
+    set transForm(value) {
+      this.$store.commit('updateTransForm', {transPosition: this.transPosition, value});
+    }
 }
 </script>
 <style scoped>

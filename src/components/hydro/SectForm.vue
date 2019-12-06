@@ -39,7 +39,20 @@
     </el-col>
 
     <el-col>
-      <el-card>计算结果</el-card>
+      <el-card>
+        计算结果
+        <div v-if="showResult">
+        <p v-if="sectForm.sectType === 'ushell'">
+          U形槽内径的取值范围是：
+        </p>
+        <p v-else>
+          矩形槽底宽的取值范围是：
+        </p>
+        <p>
+          {{ Number(range[0]).toFixed(3) }}m~{{ Number(range[1]).toFixed(3) }}m
+        </p>
+        </div>
+      </el-card>
     </el-col>
 
   </el-row>
@@ -48,13 +61,14 @@
 import {Vue, Component} from 'vue-property-decorator';
 @Component
 export default class SectForm extends Vue {
-    public sectForm: {
-        Qs?: number,
-        Qj?: number,
-        iDen?: number,
-        n?: number,
-        sectType?: 'ushell' | 'rect',
-    } = {};
+    get sectForm() {
+      return this.$store.state.sectForm;
+    }
+    set sectForm(value) {
+      this.$store.commit('updateSectForm', value);
+    }
+    public range: number[] = [0, 0];
+    public showResult: boolean = false;
     public onSectButton() {
         const {Qs, Qj, iDen, n, sectType} = this.sectForm;
         if (!(Qs && Qj && iDen && n && sectType)) {
@@ -62,7 +76,14 @@ export default class SectForm extends Vue {
                 title: '输入不完整',
                 message: '1-槽身合理尺寸试算输入内容不完整',
             });
+            return;
         }
+        const hydro = this.$store.state.hydro;
+        hydro.setFlumeSect(sectType, iDen, n);
+        const [sl, sr, jl, jr] = hydro.findW(Qs, Qj);
+        this.range = [jl, sr];
+        this.showResult = true;
+        this.$store.commit('updateHeightForm', {buttonDisabled: false});
     }
 }
 </script>
