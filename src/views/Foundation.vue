@@ -1,6 +1,6 @@
 <template>
     <div>
-        Foundation
+        基础设计
     </div>
 </template>
 <script lang="ts">

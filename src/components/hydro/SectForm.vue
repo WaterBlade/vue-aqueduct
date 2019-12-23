@@ -59,6 +59,7 @@
 </template>
 <script lang="ts">
 import {Vue, Component} from 'vue-property-decorator';
+import { HydroCalculator } from 'aqueduct';
 @Component
 export default class SectForm extends Vue {
     get sectForm() {
@@ -78,9 +79,14 @@ export default class SectForm extends Vue {
             });
             return;
         }
-        const hydro = this.$store.state.hydro;
-        hydro.setFlumeSect(sectType, iDen, n);
-        const [sl, sr, jl, jr] = hydro.findW(Qs, Qj);
+        const hydro: HydroCalculator = this.$store.state.hydro;
+        if (sectType === 'ushell') {
+          hydro.setFlumeUShell(Number(iDen), Number(n));
+        } else {
+          hydro.setFlumeRect(Number(iDen), Number(n));
+        }
+        hydro.setQ(Number(Qs), Number(Qj));
+        const [sl, sr, jl, jr] = hydro.findW();
         this.range = [jl, sr];
         this.showResult = true;
         this.$store.commit('updateHeightForm', {buttonDisabled: false});

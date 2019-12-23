@@ -11,23 +11,40 @@
         <el-form-item label="设计阶段">
             <el-input v-model="reportForm.phase" />
         </el-form-item>
-            <el-button type="primary">生成计算算稿</el-button>
+            <el-button type="primary" @click="onButton">生成计算算稿</el-button>
     </el-form>
     </el-col>
 </el-row>
 </template>
 <script lang="ts">
 import {Vue, Component} from 'vue-property-decorator';
+import { HydroCalculator } from 'aqueduct';
 @Component
 export default class ReportForm extends Vue {
-    public reportForm: {
-        project?: string,
-        building?: string,
-        phase?: string,
-    } = {};
+  get reportForm() {
+    return this.$store.state.reportForm;
+  }
+  set reportForm(value) {
+    this.$store.commit('updateReportForm', value);
+  }
+  public onButton() {
+    const loading = (this as any).$loading({
+      lock: true,
+      text: '正在生成算稿',
+      spinner: 'el-icon-loading',
+      background: 'rgba(0, 0, 0, 0.7)',
+    });
+    const hydro: HydroCalculator = this.$store.state.hydro;
+    const {project, building, phase} = this.reportForm;
+    hydro.makeReport( project, building, phase);
+    loading.close();
+  }
 }
 </script>
 <style scoped>
+body{
+  margin: 0;
+}
 .el-form .el-radio-group {
   float: left;
 }

@@ -67,9 +67,23 @@ const flumeForm = {
 };
 
 const lineForm = {
-  state: {},
+  state: {
+    inletFloor: '',
+    outletFloor: '',
+    flumeInFloor: '',
+    flumeOutFloor: '',
+  },
   mutations: {
     updateLineForm(state: any, value: any) {
+      update(state, value);
+    },
+  },
+};
+
+const reportForm = {
+  state: {},
+  mutations: {
+    updateReportForm(state: any, value: any) {
       update(state, value);
     },
   },
@@ -90,5 +104,6 @@ export default new Vuex.Store({
     transForm,
     flumeForm,
     lineForm,
+    reportForm,
   },
 });

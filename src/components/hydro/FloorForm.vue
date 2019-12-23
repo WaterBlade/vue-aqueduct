@@ -59,6 +59,7 @@
 import {Vue, Component} from 'vue-property-decorator';
 import FloorSectForm from './floor/FloorSectForm.vue';
 import TransForm from './floor/TransForm.vue';
+import { HydroCalculator } from 'aqueduct';
 @Component({
     components: {
         'floor-sect-form': FloorSectForm,
@@ -80,24 +81,36 @@ export default class FloorForm extends Vue {
       const {up, down} = this.$store.state.floorSectForm;
       const {inlet, outlet} = this.$store.state.transForm;
       const flume = this.$store.state.flumeForm;
-      const hydro = this.$store.state.hydro;
-      hydro.setUpSect(
-        up.sectType,
-        Number(up.iDen),
-        Number(up.n),
-        up.sectType === 'trape' ?
-          { b: Number(up.b), m: Number(up.m)} :
-          { b: Number(up.b) },
-      );
-      hydro.setDownSect(
-        down.sectType,
-        Number(down.iDen),
-        Number(down.n),
-        down.sectType === 'trape' ?
-          { b: Number(down.b), m: Number(down.m)} :
-          { b: Number(down.b) },
-      );
-      hydro.setFlow(
+      const hydro: HydroCalculator = this.$store.state.hydro;
+      if (up.sectType === 'trape') {
+        hydro.setUpTrape(
+          Number(up.iDen),
+          Number(up.n),
+          Number(up.b),
+          Number(up.m),
+        );
+      } else {
+        hydro.setUpRect(
+          Number(up.iDen),
+          Number(up.n),
+          Number(up.b),
+        );
+      }
+      if (down.sectType === 'trape') {
+        hydro.setDownTrape(
+          Number(down.iDen),
+          Number(down.n),
+          Number(down.b),
+          Number(down.m),
+        );
+      } else {
+        hydro.setDownRect(
+          Number(down.iDen),
+          Number(down.n),
+          Number(down.b),
+        );
+      }
+      hydro.setFloor(
         Number(inlet.l),
         Number(flume.l),
         Number(outlet.l),
@@ -107,11 +120,11 @@ export default class FloorForm extends Vue {
         Number(outlet.zeta),
         Number(flume.inletFloor),
       );
-      hydro.calcZ();
-      hydro.calcDZ();
-      [this.flumeInFloor, this.flumeOutFloor, this.outletFloor] = hydro.calcN();
+      let inletFloor: number;
+      [this.flumeInFloor, this.flumeOutFloor, inletFloor, this.outletFloor] = hydro.calcFloor();
       this.showResult = true;
       this.$store.commit('updateLineForm', {
+        inletFloor: Number(flume.inletFloor).toFixed(3),
         flumeInFloor: Number(this.flumeInFloor).toFixed(3),
         flumeOutFloor: Number(this.flumeOutFloor).toFixed(3),
         outletFloor: Number(this.outletFloor).toFixed(3),

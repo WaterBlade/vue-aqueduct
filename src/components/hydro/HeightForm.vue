@@ -26,6 +26,7 @@
 </template>
 <script lang="ts">
 import {Vue, Component, Watch} from 'vue-property-decorator';
+import { HydroCalculator } from 'aqueduct';
 @Component
 export default class HeightForm extends Vue {
     public height: number = 0;
@@ -43,17 +44,16 @@ export default class HeightForm extends Vue {
       return this.$store.state.heightForm.buttonDisabled;
     }
     public onButton() {
-      const hydro = this.$store.state.hydro;
+      const hydro: HydroCalculator = this.$store.state.hydro;
       if (this.sectType === 'rect') {
         hydro.setFlumeW(Number(this.heightForm.b));
       } else {
         hydro.setFlumeW(Number(this.heightForm.r));
       }
-
-      const height = Math.max(...hydro.findSurmount(Number(this.heightForm.t)));
+      hydro.setSurmount(Number(this.heightForm.t));
+      const height = hydro.findSurmount()[2];
       this.height = height;
       this.showResult = true;
-      hydro.setFlumeH(Math.ceil(height * 10) / 10);
     }
 }
 </script>

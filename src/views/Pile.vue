@@ -1,6 +1,6 @@
 <template>
     <div>
-        Pile
+        桩基础设计
     </div>
 </template>
 <script lang="ts">
