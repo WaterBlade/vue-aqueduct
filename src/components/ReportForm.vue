@@ -2,15 +2,6 @@
 <el-row>
     <el-col>
     <el-form :model="reportForm" label-width="120px">
-        <el-form-item label="工程名称">
-            <el-input v-model="reportForm.project" />
-        </el-form-item>
-        <el-form-item label="渡槽名称">
-            <el-input v-model="reportForm.building" />
-        </el-form-item>
-        <el-form-item label="设计阶段">
-            <el-input v-model="reportForm.phase" />
-        </el-form-item>
             <el-button type="primary" @click="onButton">生成计算算稿</el-button>
     </el-form>
     </el-col>
@@ -35,8 +26,7 @@ export default class ReportForm extends Vue {
       background: 'rgba(0, 0, 0, 0.7)',
     });
     const hydro: HydroCalculator = this.$store.state.hydro;
-    const {project, building, phase} = this.reportForm;
-    hydro.makeReport( project, building, phase);
+    hydro.makeReport();
     loading.close();
   }
 }

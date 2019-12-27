@@ -35,10 +35,10 @@ import {Vue, Component} from 'vue-property-decorator';
 import { HydroCalculator } from 'aqueduct';
 @Component
 export default class LineForm extends Vue {
-    public flumeh0!: number;
-    public flumeh!: number;
-    public inleth0!: number;
-    public inleth!: number;
+    public flumeh0: number = 0;
+    public flumeh: number = 0;
+    public inleth0: number = 0;
+    public inleth: number = 0;
     public showResult = false;
     get lineForm() {
         return this.$store.state.lineForm;
